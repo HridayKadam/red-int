@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -41,6 +41,7 @@ const STEPS = [
 const STORAGE_KEY = "redlify_tour";
 
 export function DemoTourButton() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   return (
@@ -50,6 +51,7 @@ export function DemoTourButton() {
         className="w-full justify-start rounded-xl"
         onClick={() => {
           window.localStorage.removeItem(STORAGE_KEY);
+          router.push("/");
           setOpen(true);
         }}
       >
@@ -61,17 +63,9 @@ export function DemoTourButton() {
 }
 
 export function DemoTourOverlay({ onClose }: { onClose?: () => void }) {
-  const pathname = usePathname();
   const router = useRouter();
   const [step, setStep] = useState(0);
   const current = STEPS[step];
-
-  useEffect(() => {
-    const idx = STEPS.findIndex((item) =>
-      item.href === "/" ? pathname === "/" : pathname.startsWith(item.href),
-    );
-    if (idx >= 0) setStep(idx);
-  }, [pathname]);
 
   const close = useCallback(() => {
     window.localStorage.setItem(STORAGE_KEY, "done");
@@ -90,16 +84,11 @@ export function DemoTourOverlay({ onClose }: { onClose?: () => void }) {
     [close, router],
   );
 
-  const position = useMemo(() => {
-    if (current.id === "overview") return "left-64 top-28";
-    return "left-64 top-28";
-  }, [current.id]);
-
   return (
     <div className="pointer-events-none fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/20" />
       <div
-        className={`pointer-events-auto absolute ${position} w-[360px] rounded-xl border border-border bg-white p-5 shadow-lg`}
+        className="pointer-events-auto absolute left-64 top-28 w-[360px] rounded-xl border border-border bg-white p-5 shadow-lg"
       >
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>

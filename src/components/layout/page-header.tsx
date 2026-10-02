@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function PageHeader({
   title,
@@ -20,9 +21,9 @@ export function PageHeader({
         ) : null}
       </div>
       {action && !isReactNodeAction(action) ? (
-        <Button render={<Link href={action.href} />} className="rounded-xl">
+        <Link href={action.href} className={cn(buttonVariants(), "rounded-xl")}>
           {action.label}
-        </Button>
+        </Link>
       ) : (
         action
       )}

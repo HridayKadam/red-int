@@ -183,7 +183,7 @@ function EditorSheet({
 
   return (
     <Sheet open={Boolean(item)} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-2xl" side="right">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-2xl data-[side=right]:w-full data-[side=right]:sm:max-w-2xl" side="right">
         {item ? (
           <>
             <SheetHeader>

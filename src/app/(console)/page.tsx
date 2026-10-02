@@ -6,7 +6,8 @@ import { EmptyState } from "@/components/empty-state";
 import { StatCard } from "@/components/stat-card";
 import { SovChart } from "@/components/charts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { pct, formatRank, pctPoints } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -122,9 +123,9 @@ export default async function OverviewPage() {
             <p className="font-semibold">{next.title}</p>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{next.detail}</p>
           </div>
-          <Button render={<Link href={next.href} />} className="rounded-xl">
+          <Link href={next.href} className={cn(buttonVariants(), "rounded-xl")}>
             {next.label}
-          </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

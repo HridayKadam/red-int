@@ -2,12 +2,8 @@
 
 import {
   CartesianGrid,
-  Cell,
-  Legend,
   Line,
   LineChart,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -54,7 +50,14 @@ export function SovChart({
             formatter={(value) => [`${value}%`, "Share of voice"]}
             contentStyle={{ borderRadius: 12, borderColor: "#E6E8EC" }}
           />
-          <Line type="monotone" dataKey="sov" stroke="#EA4510" strokeWidth={3} dot={{ r: 5, fill: "#EA4510" }} />
+          <Line
+            type="monotone"
+            dataKey="sov"
+            stroke="#EA4510"
+            strokeWidth={3}
+            dot={{ r: 5, fill: "#EA4510" }}
+            isAnimationActive={false}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -69,19 +72,43 @@ export function SourceDonut({
   if (data.length === 0) {
     return <p className="text-sm text-muted-foreground">No competitor-win citations yet.</p>;
   }
+  const total = data.reduce((sum, item) => sum + item.value, 0) || 1;
+  let cursor = 0;
+  const stops = data.map((item) => {
+    const start = cursor;
+    const pct = (item.value / total) * 100;
+    cursor += pct;
+    return `${SOURCE_COLORS[item.sourceType] ?? "#9ca3af"} ${start}% ${cursor}%`;
+  });
+
   return (
-    <div className="h-64 w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie data={data} dataKey="value" nameKey="sourceType" innerRadius={55} outerRadius={90} paddingAngle={2}>
-            {data.map((entry) => (
-              <Cell key={entry.sourceType} fill={SOURCE_COLORS[entry.sourceType] ?? "#9ca3af"} />
-            ))}
-          </Pie>
-          <Legend />
-          <Tooltip contentStyle={{ borderRadius: 12, borderColor: "#E6E8EC" }} />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col items-center gap-6 sm:flex-row">
+      <div
+        className="size-40 shrink-0 rounded-full"
+        style={{
+          background: `conic-gradient(${stops.join(", ")})`,
+          mask: "radial-gradient(circle, transparent 52%, #000 53%)",
+          WebkitMask: "radial-gradient(circle, transparent 52%, #000 53%)",
+        }}
+        aria-hidden
+      />
+      <ul className="space-y-2 text-sm">
+        {data
+          .slice()
+          .sort((a, b) => b.value - a.value)
+          .map((item) => (
+            <li key={item.sourceType} className="flex items-center gap-2">
+              <span
+                className="size-2.5 rounded-full"
+                style={{ background: SOURCE_COLORS[item.sourceType] ?? "#9ca3af" }}
+              />
+              <span className="capitalize">{item.sourceType.replace("_", " ")}</span>
+              <span className="text-muted-foreground">
+                {Math.round((item.value / total) * 100)}%
+              </span>
+            </li>
+          ))}
+      </ul>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function EmptyState({
   title,
@@ -19,9 +20,9 @@ export function EmptyState({
       <CardContent className="space-y-4 text-sm text-muted-foreground">
         <p>{body}</p>
         {action ? (
-          <Button render={<Link href={action.href} />} className="rounded-xl">
+          <Link href={action.href} className={cn(buttonVariants(), "rounded-xl")}>
             {action.label}
-          </Button>
+          </Link>
         ) : null}
       </CardContent>
     </Card>

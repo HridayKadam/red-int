@@ -52,7 +52,7 @@ export function PromptDrawer({
 
   return (
     <Sheet open={Boolean(promptId)} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-full sm:max-w-xl" side="right">
+        <SheetContent className="w-full sm:max-w-xl data-[side=right]:w-full data-[side=right]:sm:max-w-xl" side="right">
         <SheetHeader>
           <SheetTitle>{detail?.prompt.text ?? "Answer"}</SheetTitle>
           <SheetDescription>

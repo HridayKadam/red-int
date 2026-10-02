@@ -5,8 +5,9 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { SourceDonut } from "@/components/charts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -62,12 +63,12 @@ export default async function DiagnosePage() {
                   <p className="font-semibold">{insight.title}</p>
                 </div>
                 <p className="text-sm text-muted-foreground">{insight.detail}</p>
-                <Button
-                  className="mt-3 rounded-xl"
-                  render={<Link href={`/publish?insight=${insight.id}`} />}
+                <Link
+                  href={`/publish?insight=${insight.id}`}
+                  className={cn(buttonVariants(), "mt-3 rounded-xl")}
                 >
                   Create content for this
-                </Button>
+                </Link>
               </div>
             ))}
           </CardContent>
