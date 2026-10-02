@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Workspace {
+  id        String     @id @default(cuid())
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  brands    Brand[]
+  settings  Settings?
+}
+
+model Settings {
+  id          String    @id @default(cuid())
+  workspaceId String    @unique
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  demoMode    Boolean   @default(true)
+  modelsJson  String    @default("[\"gpt-4o-mini\"]")
+  batchSize   Int       @default(6)
+}
+
+model Brand {
+  id           String        @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name         String
+  domain       String
+  category     String
+  description  String
+  aliasesJson  String        @default("[]")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  competitors  Competitor[]
+  prompts      Prompt[]
+  runs         Run[]
+  contentItems ContentItem[]
+  insights     Insight[]
+  reports      ReportShare[]
+}
+
+model Competitor {
+  id          String @id @default(cuid())
+  brandId     String
+  brand       Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name        String
+  domain      String
+  aliasesJson String @default("[]")
+}
+
+model Prompt {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  text      String
+  intent    String
+  createdAt DateTime @default(now())
+  answers   Answer[]
+  jobs      Job[]
+}
+
+model Run {
+  id          String    @id @default(cuid())
+  brandId     String
+  brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  kind        String
+  model       String
+  status      String    @default("queued")
+  progress    Int       @default(0)
+  error       String?
+  isDemo      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+  answers     Answer[]
+  jobs        Job[]
+  insights    Insight[]
+}
+
+model Answer {
+  id        String     @id @default(cuid())
+  runId     String
+  run       Run        @relation(fields: [runId], references: [id], onDelete: Cascade)
+  promptId  String
+  prompt    Prompt     @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  rawText   String
+  model     String
+  createdAt DateTime   @default(now())
+  mentions  Mention[]
+  citations Citation[]
+}
+
+model Mention {
+  id         String  @id @default(cuid())
+  answerId   String
+  answer     Answer  @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  entityName String
+  isBrand    Boolean
+  rank       Int
+  sentiment  String
+}
+
+model Citation {
+  id         String @id @default(cuid())
+  answerId   String
+  answer     Answer @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  url        String
+  domain     String
+  sourceType String
+}
+
+model ContentItem {
+  id              String   @id @default(cuid())
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  type            String
+  title           String
+  body            String
+  targetPromptIds String   @default("[]")
+  status          String   @default("draft")
+  publishedUrl    String?
+  tone            String   @default("helpful")
+  disclosure      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Insight {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  runId     String?
+  run       Run?     @relation(fields: [runId], references: [id], onDelete: SetNull)
+  kind      String
+  title     String
+  detail    String
+  severity  String
+  promptIds String   @default("[]")
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id        String   @id @default(cuid())
+  runId     String
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  promptId  String
+  prompt    Prompt   @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  status    String   @default("pending")
+  attempts  Int      @default(0)
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReportShare {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  createdAt DateTime @default(now())
+}

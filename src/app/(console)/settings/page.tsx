@@ -1,18 +1,36 @@
-import { PageHeader } from "@/components/layout/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+import { cookies } from "next/headers";
+import { getActiveBrand } from "@/lib/repo/brands";
+import { isLiveConfigured } from "@/lib/ai";
+import { parseMode, COOKIE_MODE } from "@/lib/cookies";
+import { readJson } from "@/lib/json";
+import { SettingsForm } from "@/components/settings/settings-form";
+import { EmptyState } from "@/components/empty-state";
 
-export default function ReportPage() {
-  return (
-    <div>
-      <PageHeader
-        title="Report"
-        description="Client-ready monthly view: stats, content delivered, wins."
+export const dynamic = "force-dynamic";
+
+export default async function SettingsPage() {
+  const brand = await getActiveBrand();
+  const jar = await cookies();
+  const mode = parseMode(jar.get(COOKIE_MODE)?.value);
+  const models = readJson<string[]>(brand?.workspace.settings?.modelsJson, ["gpt-4o-mini"]);
+  const batchSize = brand?.workspace.settings?.batchSize ?? 6;
+
+  if (!brand) {
+    return (
+      <EmptyState
+        title="No workspace yet"
+        body="Seed demo data or add a brand first."
+        action={{ href: "/onboarding", label: "Add a brand" }}
       />
-      <Card className="rounded-xl">
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
-          Reports populate once a brand has tracking data.
-        </CardContent>
-      </Card>
-    </div>
+    );
+  }
+
+  return (
+    <SettingsForm
+      liveConfigured={isLiveConfigured()}
+      mode={mode}
+      models={models}
+      batchSize={batchSize}
+    />
   );
 }

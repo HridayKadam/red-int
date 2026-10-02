@@ -7,9 +7,10 @@
     "build": "next build --turbopack",
     "start": "next start --hostname 0.0.0.0 --port 3000",
     "lint": "eslint",
-    "seed": "prisma db push --force-reset && prisma db seed",
+    "seed": "prisma generate && prisma db push && tsx prisma/seed.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

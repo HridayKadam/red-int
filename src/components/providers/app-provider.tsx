@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import { COOKIE_BRAND, COOKIE_MODE, parseMode, type AppMode } from "@/lib/cookies";
 import type { BrandSummary } from "@/lib/types";
 
@@ -39,6 +40,7 @@ export function AppProvider({
   initialBrandId: string | null;
   initialMode: AppMode;
 }) {
+  const router = useRouter();
   const [brands, setBrands] = useState(initialBrands);
   const [brandId, setBrandIdState] = useState<string | null>(
     initialBrandId ?? initialBrands[0]?.id ?? null,
@@ -48,12 +50,14 @@ export function AppProvider({
   const setBrandId = useCallback((id: string) => {
     setBrandIdState(id);
     writeCookie(COOKIE_BRAND, id);
-  }, []);
+    router.refresh();
+  }, [router]);
 
   const setMode = useCallback((next: AppMode) => {
     setModeState(next);
     writeCookie(COOKIE_MODE, next);
-  }, []);
+    router.refresh();
+  }, [router]);
 
   const refreshBrands = useCallback((next: BrandSummary[]) => {
     setBrands(next);

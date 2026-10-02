@@ -1,18 +1,30 @@
-import { PageHeader } from "@/components/layout/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+import { getActiveBrand } from "@/lib/repo/brands";
+import { loadPrompts } from "@/lib/data/console";
+import { EmptyState } from "@/components/empty-state";
+import { PromptsView } from "@/components/prompts/prompts-view";
 
-export default function PromptsPage() {
-  return (
-    <div>
-      <PageHeader
-        title="Prompts"
-        description="The questions buyers ask. Run tracking, then open any row for the full model answer."
+export const dynamic = "force-dynamic";
+
+export default async function PromptsPage() {
+  const brand = await getActiveBrand();
+  if (!brand) {
+    return (
+      <EmptyState
+        title="No brand selected"
+        body="Add a brand to generate buyer prompts and run tracking."
+        action={{ href: "/onboarding", label: "Add a brand" }}
       />
-      <Card className="rounded-xl">
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
-          No prompts yet. Add a brand or seed the demo workspace.
-        </CardContent>
-      </Card>
-    </div>
+    );
+  }
+  const data = await loadPrompts(brand.id);
+  return (
+    <PromptsView
+      brandId={brand.id}
+      brandName={brand.name}
+      rows={data.rows}
+      runs={data.runs}
+      activeId={data.active?.id ?? null}
+      activeProgress={data.active?.progress ?? 0}
+    />
   );
 }
